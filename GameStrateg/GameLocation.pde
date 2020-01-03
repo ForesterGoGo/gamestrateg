@@ -37,3 +37,21 @@ class GameLocation
     }
   }
 }
+
+float correct(float temp)
+{
+  temp*=100;
+  temp = round(temp);
+  return temp/100;
+}
+
+PVector GetRandPosOn(int type,int w, int h)
+{
+  PVector temp = new PVector();
+  switch(type)
+  {
+    case 1:temp.x = random(w); temp.y = random(h);break;
+    case 2:temp.x = random(-5,5); temp.y = random(-5,5);break;
+  }
+  return temp;
+}

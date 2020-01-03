@@ -1,33 +1,62 @@
-class Rota
+class Unit
 {
-  int id;
   PVector location; //вектор положения
   PVector direction; //вектор направления
   PVector speed;
   PVector location2; //вектор конечной точки движения
+  PVector lastSpotLocation;
   boolean flagMove = false;
   boolean flagAllocate = false;
-  int IdAllocate = 0;
+  boolean flagSpoted = false;
+  boolean flagLastSpoted = false;
+  float spotRadius;
+  float permament_spot_radius;
+  String type;
+  int IdAllocate;
+  float time_to_spot;
+  int spotting_time;
+  int maxSpotTime;
   int points;
   int lvl;
-  int type;
   color colr;
-  Rota(int Did,float DxPos,float DyPos,int Dpoints,int Dlvl,int Dtype,color Dc)
+  Unit(float DxPos,float DyPos,int Dpoints,int Dlvl,String Dt,color Dc)
   {
-    id = Did;
+    spotRadius = 250;
+    permament_spot_radius = spotRadius*3;
+    spotting_time = 1000;
+    time_to_spot = 0;
+    maxSpotTime = 300; //3 секунды 
+    IdAllocate = 0;
     location = new PVector(DxPos,DyPos);
+    lastSpotLocation = new PVector(DxPos,DyPos);
     location2 = new PVector(DxPos,DyPos);
     direction = new PVector(DxPos+10,DyPos);
     speed = new PVector(0,0);
-    points=Dpoints;lvl=Dlvl;type=Dtype;colr=Dc;
+    type = Dt;
+    points=Dpoints;lvl=Dlvl;colr=Dc;
   }
   //-----------------------------------------------------------------------------------------
   void Update()
   {
-    /*if(flagAllocate) colr = color(150);
-    else if((location.x+5>mouse.x && location.x-5<mouse.x)&& 
-             (location.y+5>mouse.y && location.y-5<mouse.y)){colr = color(0,255,0);}
-    else colr = color(255);*/
+    flagLastSpoted = flagSpoted;
+    if(time_to_spot>0) time_to_spot--;
+    //----------------------------SPOT LIGHT-----------------------------
+    if(frameCount % spotting_time == 0) NewSpotLight(location.x,location.y,permament_spot_radius,4,type);
+    if(type == "own")
+    {
+      for (Unit unit : enemy)
+      {
+        UnitInteraction(this,unit);
+      }
+    }
+    if(type == "enemy")
+    {
+      for (Unit unit : own)
+      {
+        UnitInteraction(this,unit);
+      }
+    }
+    //-------------------------------------------------------------------
     
     if(!flagMove)return;
     
@@ -38,23 +67,83 @@ class Rota
       speed.normalize(); 
       direction = PVector.sub(location2,location);
       direction.normalize();
-      direction.setMag(0.2);
+      direction.setMag(0.2+0.05*(lvl+1));
       location.add(direction);
     }
   }
+  void pre_pre_Draw()
+  {
+        fill(5,50);
+    stroke(150,50);
+    
+    if(type == "own")
+      circle(location.x,location.y,spotRadius);
+    else 
+      if(flagSpoted) circle(location.x,location.y,spotRadius);
+    
+    stroke(255);
+    fill(0);
+  }
+  void pre_Draw()
+  {
+    fill(0);
+    noStroke();
+    
+    if(type == "own")
+      circle(location.x,location.y,spotRadius-1);
+    else if(flagSpoted)
+      circle(location.x,location.y,spotRadius);
+
+    
+    stroke(255);
+    fill(0);
+  }
   void Draw()
   {
-    //strokeWeight(4);
-    //line(location.x,location.y,location.x+speed.x,location.y+speed.y);  //направление объекта
-    strokeWeight(1);
-    fill(colr);
-    rect(location.x-5,location.y-5,10,10);
-    fill(0);
-    text(id,location.x-3,location.y+4.5);
-    if(flagMove) 
+    if(type == "own")
     {
-      ellipse(location2.x, location2.y, 10,10);
-      line(location.x, location.y, location2.x, location2.y);
+      //strokeWeight(1);
+      //line(location.x,location.y,direction.x,direction.y);  //направление объекта
+      stroke(255);
+      if(flagSpoted) ellipse(location.x, location.y, 20,20);
+      if(flagMove) 
+      {
+        line(location.x, location.y, location2.x, location2.y);
+        ellipse(location2.x, location2.y, 5,5);
+      }
+      noStroke();
+      fill(colr);
+      rect(location.x-5,location.y-5,10,10);
+      fill(0);
+      text(lvl,location.x-3,location.y+4.5);
+    }
+    
+    if(type == "enemy")
+    {
+      if(flagSpoted)
+      {
+        strokeWeight(1);
+        //line(location.x,location.y,direction.x,direction.y);  //направление объекта
+        stroke(255);
+        fill(0);
+        if(flagMove) 
+        {
+          line(location.x, location.y, location2.x, location2.y);
+          ellipse(location2.x, location2.y, 5,5);
+        }
+        noStroke();
+        fill(colr);
+        rect(location.x-5,location.y-5,10,10);
+        fill(0);
+        text(lvl,location.x-3,location.y+4.5);
+      }
+      else 
+      {  
+        fill(colr,time_to_spot);
+        //fill(colr,5);
+        //rect(location.x-5,location.y-5,10,10);
+        rect(lastSpotLocation.x-5,lastSpotLocation.y-5,10,10);
+      }
     }
   }
   
@@ -117,108 +206,54 @@ class Rota
   //-----------------------------------------------------------------------------------------------
 }
 
-void Addr(PVector location,int points,int lvl,int type,color colr)
+void AddUnit(PVector location,int points,int lvl,String type,color colr)
 {
-   rota[countUnitR++] = new Rota(countUnitR,location.x,location.y,points,lvl,type,colr);
-}
-void Adde(PVector location,int points,int lvl,int type,color colr)
-{
-   enemy[countUnitE++] = new Rota(countUnitE,location.x,location.y,points,lvl,type,colr);
-}
-
-void DrawUnits()
-{
-  for(int i=0;rota[i]!=null;i++)
-  {
-    stroke(255);
-    rota[i].Update();
-    rota[i].Draw();
-    noStroke();
-  }
-  
-  for(int i=0;enemy[i]!=null;i++)
-  {
-    stroke(255);
-    enemy[i].Update();
-    enemy[i].Draw();
-    noStroke();
-  }
-}
-
-void UpdateEnemyRandPos()
-{
-  for(int i=0;enemy[i]!=null;i++)
-  {
-    if(!enemy[i].flagMove) enemy[i].MoveOn(GetRandPosOn(2,0,0).setMag(40).add(enemy[i].location));
-  }
-}
-PVector GetRandPosOn(int type,int w, int h)
-{
-  PVector temp = new PVector();
   switch(type)
   {
-    case 1:temp.x = random(w); temp.y = random(h);break;
-    case 2:temp.x = random(-10,10); temp.y = random(-10,10);break;
+    case "own":   own.add(new Unit(location.x,location.y,points,lvl,type,colr));
+    break;
+    case "enemy": enemy.add(new Unit(location.x,location.y,points,lvl,type,colr));
+    break;
   }
-  return temp;
 }
 
-void DrawUpdateMouseMode()
+void UnitInteraction(Unit own, Unit enemy)
 {
-  if(mouseButton==RIGHT && mouseMode=="Null" && gameLocation.mouseIn)
-  {
-    gameCamera.ModifPosition();
-  }
-  if(mouseMode=="ObjUp1" || mouseMode=="ObjUp2" || mouseMode=="ObjUp3" || mouseMode=="ObjUp4")
-  {
-    for(int k=0;k<countUnitR;k++) if(rota[k].flagAllocate && rota[k].lvl < maxRotaLvl) rota[k].lvl++;
-    mouseMode="Null";
-  }
-  if(mouseMode=="Null")
-  {
-    if(mouseButton==LEFT && flagAllocationMouse)
+  if(own.location.dist(enemy.location) < own.spotRadius/2)
+    enemy.flagSpoted = true;
+  else
+    if(enemy.flagLastSpoted) 
     {
-      if(!keyCtrl && mouseMode!="ObjMove" && gameLocation.mouseIn)
-      {
-        countAllocate = 0;
-        for(int k=0;k<countUnitR;k++)rota[k].flagAllocate = false;
-      }
-      stroke(153);
-      noFill();
-      rect(lastMousePos.x,lastMousePos.y,mouse.x-lastMousePos.x,mouse.y-lastMousePos.y);
-      for(int k=0;k<countUnitR;k++)
-        if((rota[k].location.x+5>lastMousePos.x && rota[k].location.x+5<mouse.x)&& 
-           (rota[k].location.y+5>lastMousePos.y && rota[k].location.y+5<mouse.y)&& !rota[k].flagAllocate)
-           {rota[k].flagAllocate = true; rota[k].IdAllocate = countAllocate++;}
+      enemy.lastSpotLocation = enemy.location.copy();
+      enemy.time_to_spot = enemy.spotting_time;
     }
-  }
-  if(mouseMode=="ObjUp")
-  {
-    int lvl = 0;
-    for(int k=0;k<countUnitR;k++)
-      if(rota[k].flagAllocate)
-        lvl = rota[k].lvl;
-        
-    upPanel.enabled = true;
-    upPanel.Draw();
-    upPanel.ButtonTriggerEnabled(lvl);
-    
-  }else upPanel.enabled = false;
-  if(mouseMode=="ObjMove" && gameLocation.mouseIn)
-  {
-    fill(0);
-    stroke(255);
-    PVector temp;
+}
+
+void UnitInteraction(PVector own, float spotRadius,  Unit enemy)
+{
+  if(own.dist(enemy.location) < spotRadius/2)
+    enemy.flagSpoted = true;
+  else
+    if(enemy.flagLastSpoted) 
+    {
+      enemy.lastSpotLocation = enemy.location.copy();
+      enemy.time_to_spot = enemy.spotting_time;
+    }
+}
+
+void RelocateUnits()
+{
+  PVector temp;
     dist = 0;
-    for(int k=0;k<countUnitR;k++)
+    for (Unit unit : own)
     {
       temp = mouse.copy();
-      if(rota[k].flagAllocate)
+      if(unit.flagAllocate)
       {
         switch(countAllocate)    
         {
           case 2:
-          switch(rota[k].IdAllocate)    
+          switch(unit.IdAllocate)    
           {
             case 0:
               temp.y-=10;
@@ -229,7 +264,7 @@ void DrawUpdateMouseMode()
           }
           break;
           case 3:
-          switch(rota[k].IdAllocate)    
+          switch(unit.IdAllocate)    
           {
             case 0:
               temp.y-=10;
@@ -245,7 +280,7 @@ void DrawUpdateMouseMode()
           }
           break;
           case 4:
-          switch(rota[k].IdAllocate)    
+          switch(unit.IdAllocate)    
           {
             case 0:
               temp.y-=10;
@@ -266,36 +301,36 @@ void DrawUpdateMouseMode()
           }
           break;
         }
-        dist += rota[k].location.dist(temp);
+        dist += unit.location.dist(temp);
         ellipse(temp.x, temp.y, 10,10);
-        line(rota[k].location.x, rota[k].location.y, temp.x, temp.y);  
+        line(unit.location.x, unit.location.y, temp.x, temp.y);  
       }
     }
-    fill(255);
-    text(int(dist/30), mouse.x+10, mouse.y+10);
-    fill(0);
-  }
 }
-float correct(float temp)
+void UpdateUnits()
 {
-  temp*=100;
-  temp = round(temp);
-  return temp/100;
+  for (Unit unit : own) unit.flagSpoted = false;
+  for (Unit unit : enemy) unit.flagSpoted = false;
+  
+  for(Unit unit : own) unit.Update();
+  for(Unit unit : enemy) unit.Update();
 }
-void UpdateMouseModeOnKey()
+void DrawUnits()
 {
-  if(mouseMode == "ObjUp")
+  for(Unit unit : enemy) unit.pre_pre_Draw();
+  for(Unit unit : enemy) unit.pre_Draw();
+  
+  for(Unit unit : own) unit.pre_pre_Draw();
+  for(Unit unit : own) unit.pre_Draw();
+  
+  for(Unit unit : own) unit.Draw();
+  for(Unit unit : enemy) unit.Draw();
+}
+
+void UpdateEnemyPos()
+{
+  for(Unit unit : enemy)
   {
-    if(key1)mouseMode = "ObjUp1";
-    if(key2)mouseMode = "ObjUp2";
-    if(key3)mouseMode = "ObjUp3";
-    if(key4)mouseMode = "ObjUp4";
-  }
-  else
-  {
-    if(key1)mouseMode = "ObjMove";
-    if(key2)mouseMode = "ObjUp";
-    if(key3)mouseMode = "ObjAttack";
-    if(key4)mouseMode = "ObjUltAttack"; 
+    if(!unit.flagMove) unit.MoveOn(GetRandPosOn(2,0,0).setMag(20).add(unit.location).add((new PVector(0,0)).add((new PVector(width/2,height/2)).sub(unit.location).normalize().setMag(10))));
   }
 }

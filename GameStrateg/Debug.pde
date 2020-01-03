@@ -57,7 +57,7 @@ void debug()
 {
   fill(255);
   if (frameCount % 10 == 0) fps=int(frameRate);
-  text("FPS: "+fps,10,10);
+  text("FPS: "+fps+" | MPUpdate: "+mpu+" | MPPause: "+mpp+" | MPDraw:"+mpd,10,10);
   text("Last Key Press: "+key+" ("+keyCode+")",10,20);
   text("Mouse Press: "+flagMousePressed,10,30);
   text("Count Allocate: "+countAllocate,10,40);
@@ -65,6 +65,7 @@ void debug()
   text("Camera Scale: "+gameCamera.scale,10,60);
   
   text("Mouse in gameLocation: "+gameLocation.mouseIn,10,70);
+  //text("Temp:"+enemy.get(0).time_to_spot+" | "+enemy.get(0).maxSpotTime,10,80);
 }
 
 void console()
@@ -79,18 +80,18 @@ void DrawUnitsData()
 {
   stroke(255);
   fill(255);
-  int locX = 0, locY = 0;
-  for(int i=0;rota[i]!=null;i++)
+  int i=0;
+  for (Unit unit : enemy)
   {
-    locX = width-150;//int(rota[i].location.x+15);
-    locY = 100*i+30;
-    text("ID: "+rota[i].id+" || LVL: "+rota[i].lvl,locX,locY);
-    text("x: "+int(rota[i].location.x)+" y: "+int(rota[i].location.y),locX,locY+10);
-    text("xTo: "+int(rota[i].location2.x)+" yTo: "+int(rota[i].location2.y),locX,locY+20);
-    text("LocTo distance: "+int(rota[i].location.dist(rota[i].location2)),locX,locY+30);
-    text("Flag move: "+rota[i].flagMove,locX,locY+40);
-    if(rota[i].flagAllocate)text("IDAllocate: "+rota[i].IdAllocate,locX,locY+50);
+    int locX = width-150;//int(rota[i].location.x+15);
+    int locY = 100*(++i)+30;
+    text("LVL: "+unit.lvl,locX,locY);
+    text("x: "+int(unit.location.x)+" y: "+int(unit.location.y),locX,locY+10);
+    text("xTo: "+int(unit.location2.x)+" yTo: "+int(unit.location2.y),locX,locY+20);
+    text("LocTo distance: "+int(unit.location.dist(unit.location2)),locX,locY+30);
+    text("Flag move: "+unit.flagMove,locX,locY+40);
+    text("Flag spot: "+unit.flagSpoted,locX,locY+50);
+    text("Time of spot: "+unit.time_to_spot,locX,locY+60);
   }
   noStroke();
-  
 }
