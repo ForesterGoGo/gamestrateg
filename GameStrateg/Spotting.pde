@@ -1,25 +1,22 @@
-ArrayList<SpotLight> spotLight = new ArrayList<SpotLight>();
-class SpotLight 
+class SpotLight extends LocationEffect
 {
-  float x;
-  float y;
   float permamentSpotRadius;
   float currentRadius;
   float spotStep;
   float spotDecline;
-  String type;
-  SpotLight(float X, float Y, float pSR, float sS, String T)
+  SpotLight(float x, float y, float pSR, float sS, String T)
   {
-    x = X;
-    y = Y;
+    position = new PVector(x,y);
     permamentSpotRadius = pSR;
-    currentRadius = 0;
-    spotDecline = 10;
+    dRadius = 0;
+    spotDecline = 10; //??
     spotStep = sS;
     type = T;
+    gameLocation.AddEffect(this);
   }
   boolean Update()
   {
+    UpdatePos();
     if(currentRadius < permamentSpotRadius) 
     {  
       currentRadius+=spotStep;
@@ -27,14 +24,14 @@ class SpotLight
       {
         for (Unit unit : enemy)
         {
-          UnitInteraction((new PVector(x,y)),currentRadius,unit);
+          UnitSpotInteraction(position,currentRadius,unit);
         }
       }
       if(type == "enemy")
       {
         for (Unit unit : own)
         {
-          UnitInteraction(new PVector(x,y),currentRadius,unit);
+          UnitSpotInteraction(position,currentRadius,unit);
         }
       }
       return false;
@@ -43,32 +40,32 @@ class SpotLight
   }
   void Draw()
   {
-    if(permamentSpotRadius/10 > permamentSpotRadius-currentRadius) spotDecline--;
-    fill(255,spotDecline);
+    if(permamentSpotRadius/10 > permamentSpotRadius-currentRadius) spotDecline--; //!!!!!!!
+    fill(255,spotDecline*5);
     noStroke();
-    circle(x,y,currentRadius);
+    circle(transform.x,transform.y,currentRadius*gameCamera.GetScroll(true));
     noFill();
     stroke(100,25);
-    circle(x,y,permamentSpotRadius);
+    circle(transform.x,transform.y,permamentSpotRadius*gameCamera.GetScroll(true));
   }
 }
 void UpdateSpotLight()
 {
-  for (int i = 0; i < spotLight.size(); i++) 
+  for (int i = 0; i < gameLocation.spotLights.size(); i++) 
   {
-    SpotLight spot = spotLight.get(i);
-    if(spot.Update()) spotLight.remove(i);
+    SpotLight spot = gameLocation.spotLights.get(i);
+    if(spot.Update()) gameLocation.spotLights.remove(i);
   }
 }
 
 // DrawSpotLiht - Draw spot light
 void DrawSpotLight()
 {
-  for (SpotLight spot : spotLight) spot.Draw();
+  for (SpotLight spot : gameLocation.spotLights) spot.Draw();
 }
 
 
 void NewSpotLight(float x, float y, float pSR, float sS, String type)
 {
-  spotLight.add(new SpotLight(x,y,pSR,sS,type));
+  gameLocation.spotLights.add(new SpotLight(x,y,pSR,sS,type));
 }

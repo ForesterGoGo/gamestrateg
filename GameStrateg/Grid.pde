@@ -1,4 +1,74 @@
-class Grid
+class GridDot extends LocationObject
+{
+  GridDot(int x1, int y1)
+  {
+    position = new PVector(x1,y1);
+  }
+}
+//--------------------------------------------------------------------
+class GridLine extends LocationObject
+{
+  GridDot gridDotPos;
+  GridDot gridDotSize;
+  GridLine(int x1, int y1, int x2, int y2, color c)
+  {
+    gridDotPos = new GridDot(x1,y1);
+    gridDotSize = new GridDot(x2,y2);
+    colr = c;
+  }
+  
+  void Draw()
+  {
+    fill(colr);
+    line(gridDotPos.transform.x, gridDotPos.transform.y, gridDotSize.transform.x, gridDotSize.transform.y);
+  }
+  void UpdatePos()
+  {
+    gridDotPos.UpdatePos();
+  }
+}
+//--------------------------------------------------------------------
+class Grid extends LocationObject
+{
+  ArrayList<GridLine> gridLines;
+  Grid(int w, int h, color c)
+  {
+    gridLines = new ArrayList<GridLine>();
+    enabled = false;
+    dSize = new PVector(w,h);
+    colr = c;
+    type = "Grid";
+    
+    gameLocation.AddObject(this);
+    
+    int countX = width/int(dSize.x);
+    int countY = height/int(dSize.y);
+    
+    int sumX = 0;  
+    int sumY = 0;
+    
+    for(int i=1;i<dSize.x;i++) 
+    {
+      sumX += countX;
+      gridLines.add(new GridLine(sumX, 0, sumX, height, c));
+    }
+    for(int i=1;i<dSize.y;i++) 
+    {
+      sumY += countY; 
+      gridLines.add(new GridLine(0, sumY, width, sumY, c));
+    }
+    this.UpdatePos();
+  }
+  void Draw()
+  {
+    for (GridLine gridLine : gridLines) gridLine.Draw();
+  }
+  void UpdatePos()
+  {
+    for(GridLine gridLine : gridLines) gridLine.UpdatePos();
+  }
+}
+/*class Grid
 {
   boolean enabled;
   boolean flagEnabledExtremeLine;
@@ -56,4 +126,4 @@ class Grid
       if(flagEnabledText)text(i,5,sumY+15);
     }
   }
-}
+}*/

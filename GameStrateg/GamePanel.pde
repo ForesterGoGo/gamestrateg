@@ -20,7 +20,7 @@ class ButtonPanel
   boolean enabled = true;
   ButtonPanel(PVector Dposition, int Dtype, String Dname, color Dcolr, color DcolrPush, color DcolrMouseIn, color DcolrDisabled)
   {
-    id = ++countButtonPanel;
+    id = ++window.countButtonPanel;
     position = Dposition;
     type = Dtype;
     colr = Dcolr;
@@ -44,7 +44,7 @@ class Panel
   int currentCountButton = 0;
   Panel(PVector Dposition,int Dtype,color Dc, int DcountButton)
   {
-    id = countPanel++;
+    id = window.countPanel++;
     position = Dposition;
     type = Dtype;
     colr = Dc;
@@ -103,7 +103,7 @@ void UpdatePanels()
    for(int i=0;i<gamePanel.currentCountButton;i++)
     {
       if(gamePanel.buttonPanel[i].name == "ObjUp")
-        if(countAllocate == 1) 
+        if(mouse.countAllocate == 1) 
           gamePanel.buttonPanel[i].enabled = true;
         else 
           gamePanel.buttonPanel[i].enabled = false;
@@ -116,7 +116,7 @@ void UpdatePanels()
           
           if(mousePressed)
           {
-            mouseMode = gamePanel.buttonPanel[i].name;
+            mouse.mode = gamePanel.buttonPanel[i].name;
             gamePanel.buttonPanel[i].push = true;
           }
           else gamePanel.buttonPanel[i].push = false;
@@ -135,7 +135,7 @@ void UpdatePanels()
           {
             if(mousePressed)
             {
-              mouseMode = upPanel.buttonPanel[i].name;
+              mouse.mode = upPanel.buttonPanel[i].name;
               upPanel.buttonPanel[i].push = true;
             }
             else upPanel.buttonPanel[i].push = false;

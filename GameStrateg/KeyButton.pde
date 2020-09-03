@@ -27,21 +27,21 @@ void keyReleased()
 {
   masKey[keyCode].last = masKey[keyCode].push;
   masKey[keyCode].push = false;
-  if(mouseMode == "ObjUp")
+  if(mouse.mode == "ObjUp")
   {
     switch(key)
     {
       case '1':
-      mouseMode = "ObjUp1";
+      mouse.mode = "ObjUp1";
       break;
       case '2':
-      mouseMode = "ObjUp2";
+      mouse.mode = "ObjUp2";
       break;
       case '3':
-      mouseMode = "ObjUp3";
+      mouse.mode = "ObjUp3";
       break;
       case '4':
-      mouseMode = "ObjUp4";
+      mouse.mode = "ObjUp4";
       break;
     }
   }
@@ -50,19 +50,19 @@ void keyReleased()
     switch(key)
     {
       case '1':
-      mouseMode = "ObjMove";
+      mouse.mode = "ObjMove";
       break;
       case '2':
-      mouseMode = "ObjUp";
+      mouse.mode = "ObjUp";
       break;
       case '3':
-      mouseMode = "ObjAttack";
+      mouse.mode = "ObjAttack";
       break;
       case '4':
-      mouseMode = "ObjUltAttack";
+      mouse.mode = "ObjUltAttack";
       break;
       case '5':
-      mouseMode = "Null";
+      mouse.mode = "Null";
       break;
     }
   }
