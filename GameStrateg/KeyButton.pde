@@ -18,7 +18,7 @@ class Key
     return flag;
   }
 }
-void keyTyped()
+void keyPressed()
 {
   masKey[keyCode].last = masKey[keyCode].push;
   masKey[keyCode].push = true;

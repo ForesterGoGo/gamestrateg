@@ -77,6 +77,15 @@ void mousePressed()
   {
     cursor(MOVE);
   }
+  if(mouseButton==LEFT && mouse.mode=="ObjMove" && gameLocation.mouseIn)
+  {
+    if(dist/rateDistancePrice < gamePoints)
+    {
+      for(Unit unit : own) if(unit.flagAllocate) unit.MoveOn(LocalToGlobalPos(mouse.vec()));
+      gamePoints -= int(dist/rateDistancePrice);
+    }
+    mouse.mode = "Null";
+  }
 }
 
 void mouseReleased()

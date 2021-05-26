@@ -2,9 +2,6 @@ class Object
 {
   int id;
   PVector position;
-  PVector lastPosition;
-  PVector speed;
-  PVector direction;
   PVector transform;
   
   PVector dSize;
@@ -19,7 +16,15 @@ class Object
 }
 
 
-class LocationEffect extends Object
+class DinamicObject extends Object
+{
+  PVector lastPosition;
+  PVector speed;
+  PVector direction;
+  DinamicObject(){}
+}
+
+class LocationEffect extends DinamicObject
 {
   String type;
   boolean flagTransSize;
@@ -43,7 +48,7 @@ class LocationEffect extends Object
 }
 
 
-class LocationObject extends Object
+class LocationObject extends DinamicObject
 {
   String type;
   boolean flagTransSize;

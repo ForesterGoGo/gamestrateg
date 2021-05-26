@@ -2,12 +2,9 @@ class Frame extends LocationObject
 {
   Frame()
   {
-    //position = new PVector(0,0);
-    transform = new PVector(0,0);
-    //dSize = new PVector(width,height);
+    position = new PVector(0,0);
     dSize = new PVector(width,height);
     type = "Frame";
-    flagTransSize = true;
     
     gameLocation.AddObject(this);
   }
@@ -16,9 +13,7 @@ class Frame extends LocationObject
     noFill();
     stroke(255);
     rect(transform.x, transform.y, tSize.x-transform.x, tSize.y-transform.y);
-    ellipse(transform.x,transform.y,10,10);
     fill(255,0,0);
-    ellipse(tSize.x,tSize.y,10,10);
   }
   void UpdatePos()
   {
