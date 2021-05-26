@@ -5,10 +5,13 @@ class Camera
   float[] scrolls = {1, 0.5, 0.25, 0.125, 0.0625, 0.03125};
   int countScroll;
   int lastScroll;
+  PVector frame,frame2;
   Camera(PVector Dposition, int scale)
   {
     position = Dposition;
     countScroll = lastScroll = scale;
+    frame = new PVector(0,0);
+    frame2 = new PVector(width,height);
   }
   void Update()
   {
@@ -31,6 +34,9 @@ class Camera
       position.add(mouse.shift.copy());
       mouse.flagShifted = false;
     }
+    
+    frame = LocalToGlobalPos(new PVector(0,0));
+    frame2 = LocalToGlobalPos(new PVector(width,height));
   }
   float GetScroll(boolean flag)
   {
@@ -46,6 +52,19 @@ class Camera
       
     return step;
   }
+  
+  float GetReScroll()
+  {
+    return 1/scrolls[countScroll];
+  }
+  /*Boolean InCamera(PVector start, PVector end) НУЖНО ПОЧИНИТЬ!
+  {
+    boolean flag = true;
+    if(!(frame2.x>start.x && start.x>frame.x) && !(frame2.y>start.y && start.y>frame.y)) flag = false;
+    if(!(frame2.x>end.x && end.x>frame.x) && !(frame2.y>end.y && end.y>frame.y)) flag = false;
+
+    return flag;
+  }*/
 }
 PVector LocalToGlobalPos(PVector temp)
 {

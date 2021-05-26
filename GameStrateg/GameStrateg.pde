@@ -5,6 +5,7 @@ int temp = 0;
 ArrayList<Unit> own   = new ArrayList<Unit>();
 ArrayList<Unit> enemy = new ArrayList<Unit>();
 ArrayList<Grid> grids = new ArrayList<Grid>();
+ArrayList<Force> forces = new ArrayList<Force>();
 
 Window window;
 GameLocation gameLocation;
@@ -38,6 +39,9 @@ void setup()
   //----------------------------------------------------
   gameLocation = new GameLocation(new PVector(0,0),new PVector(width,height));
   gameLocation.FrameInit();
+  gameLocation.GameMapInit();
+  gameLocation.gameMap.flagGridBorder = true;
+  gameLocation.gameMap.enabled = true;
   //gameLocation.SubArea("S",40);
   //----------------------------------------------------
   //grids.add(new Grid(3,3,color(100)));
@@ -60,6 +64,8 @@ void setup()
   //debugWindow.border = true;
   //----------------------------------------------------
   //c = new Client(this,"192.168.57.8", 12345);
+  //----------------------------------------------------
+  forces.add(new Force()); //ZERO FORCE IS PLAYER
   //----------------------------------------------------
   AddUnit(new PVector(100,100),1000,0,"own",color(255));
   AddUnit(new PVector(100,120),1000,0,"own",color(255));
