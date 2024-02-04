@@ -1,11 +1,11 @@
-interface TypeButtonPanel 
+interface TypeButton 
 {
   int
   CLICABLE  = 0, 
   FLAG      = 1, 
   GROUPFLAG = 2;
 }
-class ButtonPanel
+class Button
 {
   int id;
   PVector position;
@@ -14,21 +14,33 @@ class ButtonPanel
   color colr;
   color colrPush;
   color colrMouseIn;
-  color colrDisabled;
+  color colrDeactivated;
   boolean push = false;
   boolean mouseIn = false;
   boolean enabled = true;
-  ButtonPanel(PVector Dposition, int Dtype, String Dname, color Dcolr, color DcolrPush, color DcolrMouseIn, color DcolrDisabled)
+  boolean deactivated = true;
+  Button(PVector Dposition, int Dtype, String Dname, color Dcolr, color DcolrPush, color DcolrMouseIn, color DcolrDeactivated)
   {
-    id = ++window.countButtonPanel;
+    id = ++window.countButton;
     position = Dposition;
     type = Dtype;
     colr = Dcolr;
     colrPush = DcolrPush;
     colrMouseIn = DcolrMouseIn;
     name = Dname;
-    colrDisabled = DcolrDisabled;
+    colrDeactivated = DcolrDeactivated;
   };
+  void Draw()
+  {
+    if(enabled) return;
+    if(deactivated) fill(colrPush);
+    else 
+      if(mouseIn)
+         if(push) fill(colrMouseIn);
+         else fill(colrPush);
+      else fill(colr);
+    rect(position.x,position.y,40,40);
+  }
 }
 class Panel
 {
@@ -40,7 +52,7 @@ class Panel
   boolean flag;
   int IdAllocate = 0;
   color colr;
-  ButtonPanel[] buttonPanel;
+  Button[] Button;
   int currentCountButton = 0;
   Panel(PVector Dposition,int Dtype,color Dc, int DcountButton)
   {
@@ -49,39 +61,41 @@ class Panel
     type = Dtype;
     colr = Dc;
     countButton = DcountButton;
-    buttonPanel = new ButtonPanel[countButton];
+    Button = new Button[countButton];
     enabled = false;
   }
   void AddButton(PVector v, int t, String n, color c, color c_p, color c_m)
   {
-    if(currentCountButton < countButton) buttonPanel[currentCountButton++] = new ButtonPanel(v,t,n,c,c_p,c_m,color(100,100,100));
+    if(currentCountButton < countButton) Button[currentCountButton++] = new Button(v,t,n,c,c_p,c_m,color(100,100,100));
   }
   void AddButton(PVector v, int t, String n, color c, color c_p, color c_m, color c_d)
   {
-    if(currentCountButton < countButton) buttonPanel[currentCountButton++] = new ButtonPanel(v,t,n,c,c_p,c_m,c_d);
+    if(currentCountButton < countButton) Button[currentCountButton++] = new Button(v,t,n,c,c_p,c_m,c_d);
   }
   void Draw()
   {
     if(enabled)
     {
       for(int i=0;i<currentCountButton;i++)
-      {
-        if(buttonPanel[i].mouseIn)
-        {
-          if(buttonPanel[i].push)fill(buttonPanel[i].colrMouseIn);
-          else fill(buttonPanel[i].colrPush);
-        }else fill(buttonPanel[i].colr);
-        if(!buttonPanel[i].enabled) fill(buttonPanel[i].colrPush);
-        rect(buttonPanel[i].position.x,buttonPanel[i].position.y,40,40);
-      }
+        Button[i].Draw();
     }
+  }
+  void ActivateButtons()
+  {
+    for(int i=0;i<currentCountButton;i++)
+        Button[i].deactivated = false;
+  }
+  void ActivateButtons(int[] mes)
+  {
+    for(int i=0;i<mes.length;i++)
+        Button[mes[i]].deactivated = false;
   }
   void ButtonTriggerEnabled(int enblID)
   {
     for(int i=0;i<4;i++)
-      upPanel.buttonPanel[i].enabled = false;
+      upPanel.Button[i].enabled = false;
     if(enblID >= 4) return;
-    upPanel.buttonPanel[enblID].enabled = true;
+    upPanel.Button[enblID].enabled = true;
   }
 }
 void DrawGamePanel()
@@ -100,49 +114,52 @@ void UpdatePanels()
 {
   if(gamePanel.enabled)
   {
+   //Проход по всем кнопкам в панели, проверка на глобальные состояния и логику
    for(int i=0;i<gamePanel.currentCountButton;i++)
     {
-      if(gamePanel.buttonPanel[i].name == "ObjUp")
-        if(mouse.countAllocate == 1) 
-          gamePanel.buttonPanel[i].enabled = true;
-        else 
-          gamePanel.buttonPanel[i].enabled = false;
+      for(int k=1;k<4;k++)
+        if(gamePanel.Button[i].name == "ObjUp"+k)
+          if(mouse.countAllocate > 1) 
+            gamePanel.Button[i].enabled = true;
+          else 
+            gamePanel.Button[i].enabled = false;
       
-      if(gamePanel.buttonPanel[i].position.x < mouse.x && gamePanel.buttonPanel[i].position.y < mouse.y && 
-        gamePanel.buttonPanel[i].position.x+40 > mouse.x && gamePanel.buttonPanel[i].position.y+40 > mouse.y &&
-        gamePanel.buttonPanel[i].enabled)
+      if(gamePanel.Button[i].position.x < mouse.x && gamePanel.Button[i].position.y < mouse.y && 
+        gamePanel.Button[i].position.x+40 > mouse.x && gamePanel.Button[i].position.y+40 > mouse.y &&
+        gamePanel.Button[i].enabled)
         {
-          gamePanel.buttonPanel[i].mouseIn = true;
+          gamePanel.Button[i].mouseIn = true;
           
           if(mousePressed)
           {
-            mouse.mode = gamePanel.buttonPanel[i].name;
-            gamePanel.buttonPanel[i].push = true;
+            mouse.mode = gamePanel.Button[i].name;
+            gamePanel.Button[i].push = true;
           }
-          else gamePanel.buttonPanel[i].push = false;
+          else gamePanel.Button[i].push = false;
         }
-        else gamePanel.buttonPanel[i].mouseIn = false;
+        else gamePanel.Button[i].mouseIn = false;
     }
   }
+  
   if(upPanel.enabled)
   {
     for(int i=0;i<upPanel.currentCountButton;i++)
     {
-      if(upPanel.buttonPanel[i].enabled)
+      if(upPanel.Button[i].enabled)
       {
-        if(upPanel.buttonPanel[i].position.x < mouse.x && upPanel.buttonPanel[i].position.y < mouse.y && 
-          upPanel.buttonPanel[i].position.x+40 > mouse.x && upPanel.buttonPanel[i].position.y+40 > mouse.y)
+        if(upPanel.Button[i].position.x < mouse.x && upPanel.Button[i].position.y < mouse.y && 
+          upPanel.Button[i].position.x+40 > mouse.x && upPanel.Button[i].position.y+40 > mouse.y)
+        {
+          if(mousePressed)
           {
-            if(mousePressed)
-            {
-              mouse.mode = upPanel.buttonPanel[i].name;
-              upPanel.buttonPanel[i].push = true;
-            }
-            else upPanel.buttonPanel[i].push = false;
-            
-            upPanel.buttonPanel[i].mouseIn = true;
+            mouse.mode = upPanel.Button[i].name;
+            upPanel.Button[i].push = true;
           }
-          else upPanel.buttonPanel[i].mouseIn = false;
+          else upPanel.Button[i].push = false;
+          
+          upPanel.Button[i].mouseIn = true;
+        }
+        else upPanel.Button[i].mouseIn = false;
       }
     }
   }
