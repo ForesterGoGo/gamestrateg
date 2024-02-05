@@ -91,8 +91,7 @@ void mousePressed()
 void mouseReleased()
 {
   mouse.flagPressed=false;
-  mouse.flagAllocation=false;
-  
+  //mouse.flagAllocation=false;
   cursor(ARROW);
 }
 
@@ -147,7 +146,7 @@ void DrawUpdateMouseMode()
       if(!masKey[17].push && mouse.mode!="ObjMove" && gameLocation.mouseIn)
       {
         mouse.countAllocate = 0;
-        for(Unit unit : own) unit.flagAllocate = false;
+        for(Unit unit : own) unit.flagAllocate = false; // Сброс выделения <-------------------
       }
       stroke(153);
       noFill();

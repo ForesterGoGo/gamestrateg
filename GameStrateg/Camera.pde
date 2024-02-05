@@ -17,7 +17,7 @@ class Camera
   {
     if(mouse.flagScrolled)
     {
-      if(mouse.scroll>0) 
+      if(mouse.scroll<0) 
       {
         if(countScroll>0) countScroll--;
       }

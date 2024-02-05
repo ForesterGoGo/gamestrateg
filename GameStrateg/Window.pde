@@ -6,7 +6,7 @@ class Window
   int mpp; //Milisec per pause
   boolean flagTurnDebug;
   boolean flagTurnConsole;
-  int countButtonPanel = 0; // ЗАМЕНИТЬ НА ДИНАМИЧЕСКИЕ ЛИСТЫ
+  int countButton = 0; // ЗАМЕНИТЬ НА ДИНАМИЧЕСКИЕ ЛИСТЫ
   int countPanel = 0; // ЗАМЕНИТЬ НА ДИНАМИЧЕСКИЕ ЛИСТЫ
   void Init()
   {
